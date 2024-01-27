@@ -6,6 +6,8 @@ dicty = {}
 dataList = []   #已记录单词列表
 keyList = []    #全局已保存单词的key
 freqList = []   #词频列表
+dicKey = []     #shuffled list
+location = 0
 # print(content)
 print("{:-^50s}".format(''))
 for line in content.split("\n"):
@@ -13,12 +15,32 @@ for line in content.split("\n"):
         key,value = line.split('：')
         # print(key,value)
         dicty[key] = value
-# print(dicty)
 print("词库获取成功")
+
+def shuffle():
+    global dicKey
+    dicKey = []
+    while True:
+        chos = input("$该操作不可逆$请输入密钥:")
+        if chos == "89757":
+            break
+        else:
+            print("错误")
+            return
+    for i in range(len(dicty)):
+        dicKey.append(i)
+
+    random.shuffle(dicKey)
+    with open('/Users/tcy/code/dicty/sequence.txt','r+',encoding='UTF-8-sig') as file:
+        for i in dicKey:
+            file.write(","+str(i))
+
 #初始化
 def init():
     global dataList
     global freqList 
+    global dicKey
+    global location
     dataList = []
     with open('/Users/tcy/code/dicty/data.txt','r+',encoding='UTF-8-sig') as file:
         data = file.readlines()
@@ -31,8 +53,16 @@ def init():
         for i in data[1].split(','):
             if i != '':
                 freqList.append(int(i))
-    print(freqList)
-    print(dataList)
+        location = int(data[2])
+        print(location)
+    with open('/Users/tcy/code/dicty/sequence.txt','r+',encoding='UTF-8-sig') as file:
+        sequence = file.read()
+        for i in sequence.split(","):
+            if i != '':
+                dicKey.append(int(i))
+    # print(dicKey)
+    # print(freqList)
+    # print(dataList)
     # print(keyList)
     
 def clear():
@@ -146,18 +176,19 @@ def addNew():
     showList = [] #储存显示的单词编号
     global freqList
     global dataList
-    for i in range(10):
-        ranum = random.randint(0,len(dicty))
-        word = list(dicty.keys())[ranum]
+    global location
+    for i in range(location,location+10):
+        word = list(dicty.keys())[dicKey[i]]
         if word not in keyList:
             count += 1
             print("%-15s\t"%(str(count)+'.'+word),end='')
-            showList.append(ranum)
+            showList.append(dicKey[i])
             if count % 5 == 0:
                 print()
             if count == 10:
                 count = 0
                 break
+    location += 10
     # print(showList)
     print()
     print("{:-^50s}".format(''))
@@ -182,6 +213,7 @@ def addNew():
 def writein():
     global dataList
     global freqList
+    global location
     print("正在保存...")
     with open('/Users/tcy/code/dicty/data.txt','r+',encoding='UTF-8-sig') as file:
         for i in dataList:
@@ -189,7 +221,8 @@ def writein():
         file.write("\n")
         for i in freqList:
             file.write(","+str(i))
-            
+        file.write("\n")
+        file.write(str(location))
         print("保存成功")
         # print(freqList)
 def choose(length,fre):
@@ -230,6 +263,9 @@ def main():
                 clear()
                 writein()
                 break
+            elif chos1 == 999:
+                clear()
+                shuffle()
         except:
             print("Error")
             print()
