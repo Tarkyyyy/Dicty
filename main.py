@@ -1,5 +1,3 @@
-import json
-import time
 import os
 import random
 with open('/Users/tcy/code/dicty/3500words.txt','r',encoding='UTF-8-sig') as file:
@@ -52,12 +50,17 @@ def review():
     for i in range(len(dataList)):
         keyList.append(list(dicty.keys())[dataList[i]])
     
+    while True:
+        try:
+            fre = int(input("请输入需要查看的等级(默认为5):"))
+            if fre >= 0 and fre <= 9:
+                break
+        except:
+            continue
     #接口
-    if len(dataList) <= 10:
-        showlist = random.sample([i for i in range(0,len(dataList))],len(dataList))
-    else:
-        showlist = random.sample([i for i in range(0,len(dataList))],10)
-    print(showlist)
+    # showlist = random.sample([i for i in range(0,len(dataList))],len(dataList))
+    showlist = choose(len(dataList),fre)
+    # print(showlist)
     
     for i in showlist:
         word = keyList[i]
@@ -70,15 +73,9 @@ def review():
         if count == 10:
             count = 0
             break
-    # for i in keyList:
-    #     count += 1
-    #     showList.append(i)
-    #     print("%-15s\t"%(str(count)+'.'+i),end='')
-    #     if count % 5 == 0:
-    #         print()
-    #     snum += 1
-    print()
+
     while True:
+        print()
         print("{:-^50s}".format(''))
         print("1.查询释义\t2.标记单词\t3.退出")
         print("{:-^50s}".format(''))
@@ -118,21 +115,31 @@ def markfreq():
     global keyList
     global keyList_tem
     global showlist
+    print("-a:提升等级\t-d:降低等级(默认为提升)")
     while True:
         chos = list(input("请选择需要标记的单词(词前序号):").split())
         if len(chos) == 0:
             break
-        if len(chos) == 1:
+        if len(chos) >= 1:
+            if chos[-1] == "-a" or chos[-1] == "-d":
+                com = chos[-1]
+                chos.pop()
+            else:
+                com = "-a"
             for i in chos:
                 try:
-                    print(keyList_tem[int(i)-1]) 
-                    freqList[showlist[int(i)-1]] += 1
+                    print(keyList_tem[int(i)-1])
+                    print(dicty[keyList_tem[int(i)-1]]) 
+                    print()
+                    if com == "-a":
+                        freqList[showlist[int(i)-1]] += 1
+                    elif com == "-d":
+                        freqList[showlist[int(i)-1]] -= 1
                 except:
                     print("包含非法输入")
                     break
         else:
             continue
-
 
 def addNew():
     count = 0
@@ -172,7 +179,6 @@ def addNew():
     else:
         print("无")
 
-
 def writein():
     global dataList
     global freqList
@@ -186,7 +192,19 @@ def writein():
             
         print("保存成功")
         # print(freqList)
-
+def choose(length,fre):
+    global keyList
+    global dataList
+    global freqList
+    choiList = []
+    for i in range(len(freqList)):
+        if freqList[i] == int(fre):
+            choiList.append(i)
+    random.shuffle(choiList)
+    if len(choiList) >= length:
+        return random.sample(choiList,length)
+    else:
+        return random.sample(choiList,len(choiList))
 
 def main():
     global dataList
@@ -216,7 +234,8 @@ def main():
             print("Error")
             print()
             continue
-        
+
+clear()
 init()
 print("正在初始化...")
 main()
