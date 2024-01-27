@@ -54,7 +54,7 @@ def init():
             if i != '':
                 freqList.append(int(i))
         location = int(data[2])
-        print(location)
+        # print(location)
     with open('/Users/tcy/code/dicty/sequence.txt','r+',encoding='UTF-8-sig') as file:
         sequence = file.read()
         for i in sequence.split(","):
